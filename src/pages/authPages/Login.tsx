@@ -6,9 +6,8 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { RootState } from "../../store";
 import { login } from "../../store/userSlice";
 import axiosInstance, { setAccessToken } from "../../lib/axios";
-import RESPONSE_STATUSES from "../../constants/responseStatuses";
-import BACKEND_RESOURCES from "../../constants/backendResources";
 import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../../constants/general";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -33,11 +32,11 @@ const Login = () => {
         form
       );
 
-      const { name, email } = res.data.data.user;
+      const { _id, name, email } = res.data.data.user;
       const accessToken = res.data.data.accessToken;
 
       setAccessToken(accessToken);
-      dispatch(login({ name, email, accessToken }));
+      dispatch(login({ userId: _id, name, email, accessToken }));
 
       // Always check the status after dispatching
       if (res.status === RESPONSE_STATUSES.SUCCESS) {

@@ -6,9 +6,8 @@ import { useNavigate } from "react-router";
 import axiosInstance from "../lib/axios";
 import { logout } from "../store/userSlice";
 import CustomDialog from "@/components/custom/CustomDialog";
-import BACKEND_RESOURCES from "../constants/backendResources";
-import RESPONSE_STATUSES from "../constants/responseStatuses";
 import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../constants/general";
 import DeleteItemOverlayContent from "@/components/custom/DeleteItemOverlayContent";
 
 const Profile = () => {

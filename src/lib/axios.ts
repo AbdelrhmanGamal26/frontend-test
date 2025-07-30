@@ -2,8 +2,7 @@ import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import { store } from "../store";
 import { logout, setToken } from "../store/userSlice";
-import RESPONSE_STATUSES from "../constants/responseStatuses";
-import BACKEND_RESOURCES from "../constants/backendResources";
+import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../constants/general";
 
 declare module "axios" {
   export interface AxiosRequestConfig {

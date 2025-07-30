@@ -22,7 +22,9 @@ const CustomDialog = ({
       <DialogTrigger className={`${triggerClasses} py-[6px] flex items-center`}>
         {trigger}
       </DialogTrigger>
-      <DialogContent className={contentClassName}>{children}</DialogContent>
+      <DialogContent className={contentClassName} showCloseButton={false}>
+        {children}
+      </DialogContent>
     </Dialog>
   );
 };

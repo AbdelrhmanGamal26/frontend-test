@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type User = {
+  userId: string;
   name: string;
   email: string;
 };
@@ -25,7 +26,11 @@ const userSlice = createSlice({
       state: UserState,
       action: PayloadAction<User & { accessToken: string }>
     ) {
-      state.user = { name: action.payload.name, email: action.payload.email };
+      state.user = {
+        userId: action.payload.userId,
+        name: action.payload.name,
+        email: action.payload.email,
+      };
       state.isLoggedIn = true;
       state.accessToken = action.payload.accessToken;
     },

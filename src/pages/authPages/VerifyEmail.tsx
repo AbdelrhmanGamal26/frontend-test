@@ -3,8 +3,7 @@ import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
-import BACKEND_RESOURCES from "../../constants/backendResources";
-import RESPONSE_STATUSES from "../../constants/responseStatuses";
+import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../../constants/general";
 
 const VerifyEmail = () => {
   const [params] = useSearchParams();

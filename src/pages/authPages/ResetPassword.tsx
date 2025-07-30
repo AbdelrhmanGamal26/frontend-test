@@ -4,9 +4,8 @@ import { useSearchParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import axiosInstance from "../../lib/axios";
-import BACKEND_RESOURCES from "../../constants/backendResources";
-import RESPONSE_STATUSES from "../../constants/responseStatuses";
 import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
 
 type UserInput = {
   password: string;

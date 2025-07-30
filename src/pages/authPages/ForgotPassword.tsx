@@ -3,9 +3,8 @@ import { Link } from "react-router";
 import { toast } from "react-toastify";
 import React, { useState } from "react";
 import axiosInstance from "../../lib/axios";
-import BACKEND_RESOURCES from "../../constants/backendResources";
-import RESPONSE_STATUSES from "../../constants/responseStatuses";
 import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");

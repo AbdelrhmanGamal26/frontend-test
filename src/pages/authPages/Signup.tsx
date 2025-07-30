@@ -5,9 +5,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { RootState } from "../../store";
 import axiosInstance from "../../lib/axios";
-import BACKEND_RESOURCES from "../../constants/backendResources";
-import RESPONSE_STATUSES from "../../constants/responseStatuses";
 import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
 
 const Signup = () => {
   const user = useSelector((state: RootState) => state.user);

@@ -1,4 +1,4 @@
-const RESPONSE_STATUSES = {
+export const RESPONSE_STATUSES = {
   SUCCESS: 200,
   CREATED: 201,
   NO_CONTENT: 204,
@@ -12,4 +12,9 @@ const RESPONSE_STATUSES = {
   TOO_MANY_REQUESTS: 429,
 } as const;
 
-export default RESPONSE_STATUSES;
+export const BACKEND_RESOURCES = {
+  AUTH: "/auth",
+  USERS: "/users",
+  CONVERSATIONS: "/conversations",
+  MESSAGES: "/messages",
+} as const;
