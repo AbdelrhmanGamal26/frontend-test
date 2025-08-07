@@ -21,6 +21,20 @@ interface Member {
   _id: string;
 }
 
+interface Member {
+  email: string;
+  name: string;
+  _id: string;
+}
+
+type ConversationType = {
+  _id: string;
+  roomId: string;
+  members: Member[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 type RoomType = Awaited<ReturnType<typeof createOrJoinConversation>>;
 type MessageType = Awaited<ReturnType<typeof fetchConversationMessages>>[0];
 
@@ -58,6 +72,8 @@ const Chat = () => {
   const { data: conversations = [] } = useQuery({
     queryKey: ["conversations"],
     queryFn: getUserConversations,
+    refetchOnWindowFocus: true,
+    staleTime: 60 * 1000,
   });
 
   /** =============== 2. Fetch messages for current room =============== */
@@ -65,6 +81,7 @@ const Chat = () => {
     queryKey: ["messages", conversationIdRef.current],
     queryFn: () => fetchConversationMessages(conversationIdRef.current),
     enabled: !!conversationIdRef.current,
+    refetchOnWindowFocus: false,
   });
 
   /** =============== 3. Create or Join Conversation =============== */
@@ -120,8 +137,19 @@ const Chat = () => {
         msg: newMessage,
       });
 
-      // Refresh conversations list preview
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.setQueryData(
+        ["conversations"],
+        (old: ConversationType[] = []) =>
+          old.map((conversation: ConversationType) =>
+            conversation._id === newMessage.conversationId
+              ? {
+                  ...conversation,
+                  lastMessage: newMessage.content,
+                  updatedAt: new Date().toISOString(),
+                }
+              : conversation
+          )
+      );
     },
     onError: () => toast("Failed to send message."),
   });
@@ -143,8 +171,20 @@ const Chat = () => {
         (old = []) => [...old, data.msg]
       );
 
-      // Optionally update conversations list preview
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      // Update conversations list preview
+      queryClient.setQueryData(
+        ["conversations"],
+        (old: ConversationType[] = []) =>
+          old.map((conversation: ConversationType) =>
+            conversation._id === data.msg.conversationId
+              ? {
+                  ...conversation,
+                  lastMessage: data.msg.content,
+                  updatedAt: new Date().toISOString(),
+                }
+              : conversation
+          )
+      );
     };
 
     socket.on("privateRoomChat", handleIncomingMessage);
