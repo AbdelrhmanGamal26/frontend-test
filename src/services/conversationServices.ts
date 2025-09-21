@@ -25,7 +25,9 @@ type MessageType = {
 };
 
 // create a new conversation or join existing one
-export const createOrJoinConversation = async (recipientEmail: string) => {
+export const createOrJoinConversation = async (
+  recipientEmail: string
+): Promise<ConversationType> => {
   const response = await axiosInstance.post(
     `${BACKEND_RESOURCES.CONVERSATIONS}`,
     { recipientEmail }
@@ -52,7 +54,9 @@ export const getUserConversations = async () => {
 };
 
 // get conversation messages
-export const fetchConversationMessages = async (conversationId: string) => {
+export const fetchConversationMessages = async (
+  conversationId: string
+): Promise<MessageType[]> => {
   const res = await axiosInstance.get(
     `${BACKEND_RESOURCES.MESSAGES}?conversationId=${conversationId}`
   );
@@ -61,7 +65,7 @@ export const fetchConversationMessages = async (conversationId: string) => {
     throw new Error("Failed to fetch messages.");
   }
 
-  return res.data?.data?.messages as MessageType[];
+  return res.data?.data?.messages;
 };
 
 export const sendMessage = async (
