@@ -1,8 +1,8 @@
 import PartActionButton from "./PartActionButton";
 
 interface DeleteItemOverlayContentTypes {
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   clickHandler: () => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const DeleteItemOverlayContent = ({

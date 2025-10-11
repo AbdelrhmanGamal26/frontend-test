@@ -1,0 +1,33 @@
+import { MessageType } from "@/pages/Chat";
+
+const MessagesContainer = ({
+  userId,
+  messages,
+  messagesEndRef,
+}: {
+  messages: MessageType[];
+  userId: string | undefined;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+}) => {
+  return (
+    <div className="w-full h-[83vh] overflow-y-auto pb-5 pt-3">
+      <ul id="messages" className="relative flex flex-col gap-y-1">
+        {messages.map((msg) => (
+          <li
+            key={msg._id}
+            className={`w-fit max-w-[450px] text-wrap break-words px-2 py-1 rounded-md ${
+              msg.senderId === userId
+                ? "self-end bg-green-200"
+                : "self-start bg-blue-200"
+            }`}
+          >
+            {msg.content}
+          </li>
+        ))}
+        <div ref={messagesEndRef} />
+      </ul>
+    </div>
+  );
+};
+
+export default MessagesContainer;

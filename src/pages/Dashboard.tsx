@@ -1,4 +1,4 @@
-import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
 
 const Dashboard = () => {
   return (

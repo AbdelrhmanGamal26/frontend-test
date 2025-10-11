@@ -1,13 +1,20 @@
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { RootState } from "../../store";
 import { login } from "../../store/userSlice";
+import AuthForm from "@/components/shared/AuthForm";
+import FormHeader from "@/components/shared/FormHeader";
+import CustomLink from "@/components/shared/CustomLink";
+import CustomButton from "@/components/shared/CustomButton";
 import axiosInstance, { setAccessToken } from "../../lib/axios";
-import SuspenseWrapper from "@/components/custom/SuspenseWrapper";
+import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
+import LabeledInputField from "@/components/shared/LabeledInputField";
+import AuthFormContainer from "@/components/shared/AuthFormContainer";
 import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../../constants/general";
+import AuthActionLinkContainer from "@/components/shared/AuthActionLinkContainer";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -56,81 +63,50 @@ const Login = () => {
 
   return (
     <SuspenseWrapper>
-      <div className="flex-col w-[28vw] min-h-[25vh] bg-gradient-to-b from-green-400 to-red-400 px-7 py-5 rounded-4xl">
-        <h2 className="text-2xl text-center mb-8 w-full text-indigo-700 font-bold">
-          login
-        </h2>
-        <form onSubmit={submitHandler} className="flex-col h-full">
-          <div>
-            <div className="flex flex-col items-between w-full mb-5">
-              <label
-                htmlFor="email"
-                className="mb-1 ms-[2px] text-lg font-bold text-indigo-700"
-              >
-                Email
-              </label>
-              <input
-                type="text"
-                id="email"
-                value={form.email}
-                placeholder="Enter your email"
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="border-2 border-yellow-200 rounded-md px-2 text-md h-[2.5vw] outline-none focus:border-green-500 focus:placeholder:text-transparent"
-              />
-            </div>
-            <div className="flex flex-col items-between w-full h-[10vh]">
-              <label
-                htmlFor="password"
-                className="mb-1 ms-[2px] text-lg font-bold text-indigo-700"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={form.password}
-                placeholder="Enter your password"
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="border-2 border-yellow-200 rounded-md px-2 text-md h-[2.5vw] outline-none focus:border-green-500 focus:placeholder:text-transparent"
-              />
-            </div>
-          </div>
-          <div>
-            <div className="flex gap-x-1">
+      <AuthFormContainer>
+        <FormHeader title="Login" />
+        <AuthForm onSubmit={submitHandler}>
+          <Fragment>
+            <LabeledInputField
+              id="email"
+              labelName="Email"
+              inputFieldValue={form.email}
+              placeholder="Enter your email"
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            <LabeledInputField
+              id="password"
+              labelName="Password"
+              fieldType="password"
+              inputFieldValue={form.password}
+              placeholder="Enter your password"
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </Fragment>
+          <Fragment>
+            <AuthActionLinkContainer>
               <p>Forgot Password?</p>
-              <Link
+              <CustomLink
                 to="/forgot-password"
-                className="text-indigo-700 hover:text-orange-200"
-              >
-                Click here
-              </Link>
-            </div>
-            <div className="flex gap-x-1">
+                title="Click here"
+                linkClasses="text-indigo-700 hover:!text-orange-200 !bg-transparent !w-fit"
+              />
+            </AuthActionLinkContainer>
+            <AuthActionLinkContainer>
               <p>Didn't verify your account?</p>
-              <Link
+              <CustomLink
                 to="/resend-verification-email"
-                className="text-indigo-700 hover:text-orange-200"
-              >
-                Resend Verification email
-              </Link>
-            </div>
+                title="Resend Verification email"
+                linkClasses="text-indigo-700 hover:!text-orange-200 !bg-transparent !w-fit"
+              />
+            </AuthActionLinkContainer>
+          </Fragment>
+          <div className="w-full flex justify-end items-end gap-x-5 mt-4">
+            <CustomLink to="/signup" title="Signup" />
+            <CustomButton title="Login" type="submit" />
           </div>
-          <div className="w-full flex justify-end items-end gap-x-5 mt-10">
-            <Link
-              className="w-[5vw] py-1 flex justify-center items-center text-indigo-700 bg-yellow-200 hover:bg-green-500 transition-all duration-200 rounded-md cursor-pointer"
-              to="/signup"
-            >
-              Signup
-            </Link>
-            <button
-              className="w-[5vw] py-1 flex justify-center items-center text-indigo-700 bg-yellow-200 hover:bg-green-500 transition-all duration-200 rounded-md cursor-pointer"
-              type="submit"
-            >
-              Login
-            </button>
-          </div>
-        </form>
-      </div>
+        </AuthForm>
+      </AuthFormContainer>
     </SuspenseWrapper>
   );
 };

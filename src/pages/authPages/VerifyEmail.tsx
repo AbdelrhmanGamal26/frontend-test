@@ -14,7 +14,7 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verifyUserAccount = async () => {
       try {
-        const response = await axiosInstance.post(
+        const response = await axiosInstance.get(
           `${BACKEND_RESOURCES.AUTH}/verify-email?verificationToken=${verificationToken}`
         );
 

@@ -4,10 +4,10 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 interface CustomDialogTypes {
   open: boolean;
   trigger: JSX.Element;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  children: React.ReactNode;
   triggerClasses?: string;
   contentClassName?: string;
+  children: React.ReactNode;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const CustomDialog = ({
   open,
@@ -19,7 +19,9 @@ const CustomDialog = ({
 }: CustomDialogTypes) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className={`${triggerClasses} py-[6px] flex items-center`}>
+      <DialogTrigger
+        className={`${triggerClasses} py-[6px] flex items-center outline-none`}
+      >
         {trigger}
       </DialogTrigger>
       <DialogContent className={contentClassName} showCloseButton={false}>
