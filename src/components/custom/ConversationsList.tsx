@@ -25,9 +25,12 @@ const ConversationsList = ({
 
           return (
             <ConversationItem
+              alt="User photo"
               key={conversation._id}
+              photo={recipientUser?.photo}
               recipientUser={recipientUser}
               onClick={() => onConversationClick(conversation)}
+              userInitials={recipientUser?.name.slice(0, 2).toUpperCase()}
             />
           );
         })

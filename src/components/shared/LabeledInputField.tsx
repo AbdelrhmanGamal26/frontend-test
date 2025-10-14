@@ -1,5 +1,6 @@
 type LabeledInputFieldType = {
   id: string;
+  required: boolean;
   labelName: string;
   fieldType?: string;
   placeholder: string;
@@ -11,6 +12,7 @@ type LabeledInputFieldType = {
 
 const LabeledInputField = ({
   id,
+  required,
   onChange,
   labelName,
   placeholder,
@@ -26,13 +28,14 @@ const LabeledInputField = ({
         className={`mb-1 ms-[2px] text-lg font-bold text-indigo-700 ${labelClasses}`}
       >
         {labelName}
+        <span className="text-red-500">{required && "*"}</span>
       </label>
       <input
-        type={fieldType}
         id={id}
+        type={fieldType}
+        onChange={onChange}
         value={inputFieldValue}
         placeholder={placeholder}
-        onChange={onChange}
         className={`border-2 border-yellow-200 rounded-md px-2 text-md h-[2.5vw] outline-none focus:border-green-500 focus:placeholder:text-transparent ${inputClasses}`}
       />
     </div>

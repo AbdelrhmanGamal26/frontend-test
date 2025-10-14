@@ -1,28 +1,6 @@
 import axiosInstance from "@/lib/axios";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "@/constants/general";
-
-interface Member {
-  email: string;
-  name: string;
-  _id: string;
-}
-
-type ConversationType = {
-  _id: string;
-  roomId: string;
-  members: Member[];
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type MessageType = {
-  _id: string;
-  conversationId: string;
-  senderId: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import { ConversationType, MessageType } from "@/@types/general";
 
 // create a new conversation or join existing one
 export const createOrJoinConversation = async (

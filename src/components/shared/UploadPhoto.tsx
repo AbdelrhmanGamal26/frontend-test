@@ -7,7 +7,7 @@ type UploadPhotoType = {
   onSetImage: React.Dispatch<React.SetStateAction<File | null>>;
 };
 
-const UploadPhoto = ({ image, imagePreview, onSetImage }: UploadPhotoType) => {
+const UploadPhoto = ({ image, onSetImage, imagePreview }: UploadPhotoType) => {
   const imageRef = useRef(null);
 
   return (
@@ -16,8 +16,8 @@ const UploadPhoto = ({ image, imagePreview, onSetImage }: UploadPhotoType) => {
         Photo
       </span>
       <input
-        type="file"
         id="photo"
+        type="file"
         ref={imageRef}
         className="hidden"
         onChange={(e) => {
@@ -59,8 +59,8 @@ const UploadPhoto = ({ image, imagePreview, onSetImage }: UploadPhotoType) => {
         </label>
         {imagePreview && (
           <img
-            src={imagePreview ? imagePreview : ""}
             alt="avatar"
+            src={imagePreview ? imagePreview : ""}
             className="w-[48px] h-[48px] object-fill rounded-full"
           />
         )}

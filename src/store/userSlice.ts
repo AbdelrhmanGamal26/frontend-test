@@ -4,6 +4,7 @@ type User = {
   userId: string;
   name: string;
   email: string;
+  photo?: string;
 };
 
 export type UserState = {
@@ -30,6 +31,7 @@ const userSlice = createSlice({
         userId: action.payload.userId,
         name: action.payload.name,
         email: action.payload.email,
+        photo: action.payload.photo,
       };
       state.isLoggedIn = true;
       state.accessToken = action.payload.accessToken;
@@ -37,6 +39,12 @@ const userSlice = createSlice({
     setToken(state, action: PayloadAction<string>) {
       state.accessToken = action.payload;
     },
+    // updateUserData: (state, action) => {
+    //   if (state.user) {
+    //     state.user.name = action.payload.name;
+    //     state.user.photo = action.payload.photo;
+    //   }
+    // },
     logout(state) {
       state.user = null;
       state.isLoggedIn = false;
@@ -45,5 +53,6 @@ const userSlice = createSlice({
   },
 });
 
+// export const { login, setToken, updateUserData, logout } = userSlice.actions;
 export const { login, setToken, logout } = userSlice.actions;
 export default userSlice.reducer;

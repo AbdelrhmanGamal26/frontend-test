@@ -3,6 +3,12 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  Member,
+  APIError,
+  MessageType,
+  ConversationType,
+} from "@/@types/general";
+import {
   sendMessage,
   getUserConversations,
   createOrJoinConversation,
@@ -11,7 +17,6 @@ import {
 import { RootState } from "@/store";
 import socket from "@/websocket/socketHandler";
 import Loader from "@/components/shared/Loader";
-import { APIError, ConversationType, Member } from "@/@types/general";
 import ConversationsList from "@/components/custom/ConversationsList";
 import MessagesContainer from "@/components/custom/MessagesContainer";
 import MessageSendingForm from "@/components/custom/MessageSendingForm";
@@ -21,16 +26,10 @@ import StartChatDialogButton from "@/components/custom/StartChatDialogButton";
 import ResourcesLoaderContainer from "@/components/shared/ResourcesLoaderContainer";
 import FailedResourcesLoadingLoader from "@/components/shared/FailedResourcesLoadingLoader";
 
-export type RoomType = Awaited<ReturnType<typeof createOrJoinConversation>>;
-
-export type MessageType = Awaited<
-  ReturnType<typeof fetchConversationMessages>
->[0];
-
 const Chat = () => {
   const user = useSelector((state: RootState) => state.user);
   const queryClient = useQueryClient();
-  const [room, setRoom] = useState<RoomType | null>(null);
+  const [room, setRoom] = useState<ConversationType | null>(null);
   const [showMessages, setShowMessages] = useState(false);
   const [message, setMessage] = useState("");
   const [contact, setContact] = useState("");
@@ -85,41 +84,33 @@ const Chat = () => {
   });
 
   /** =============== 3. Create or Join Conversation =============== */
+  const handleJoinRoom = useCallback((conversation: ConversationType) => {
+    setRoom(conversation);
+    setShowMessages(true);
+
+    const conversationId = conversation._id;
+    const newRoomId = conversation.roomId;
+
+    conversationIdRef.current = conversationId;
+    roomIdRef.current = newRoomId;
+
+    // Connect socket and join room
+    socket.connect();
+    socket.emit("joinRoom", { roomId: newRoomId });
+  }, []);
+
   const handleConversationClick = useCallback(
     (conversation: ConversationType) => {
       // Set room directly without making API call (conversation already exists)
-      setRoom(conversation);
-      setShowMessages(true);
-
-      const conversationId = conversation._id;
-      const newRoomId = conversation.roomId;
-      conversationIdRef.current = conversationId;
-      roomIdRef.current = newRoomId;
-
-      // Connect socket and join room
-      socket.connect();
-      socket.emit("joinRoom", { roomId: newRoomId });
-
-      // No need to invalidate or refetch conversations - they're already loaded
-      // The messages useQuery will automatically fetch when conversationIdRef updates
+      handleJoinRoom(conversation);
     },
-    []
+    [handleJoinRoom]
   );
 
   const { mutate: joinOrCreateRoom } = useMutation({
     mutationFn: createOrJoinConversation,
     onSuccess: (conversation) => {
-      setRoom(conversation);
-      setShowMessages(true);
-
-      const conversationId = conversation._id;
-      const newRoomId = conversation.roomId;
-      conversationIdRef.current = conversationId;
-      roomIdRef.current = newRoomId;
-
-      // Connect socket and join room
-      socket.connect();
-      socket.emit("joinRoom", { roomId: newRoomId });
+      handleJoinRoom(conversation);
 
       // Refresh conversations list preview
       queryClient.invalidateQueries({
@@ -242,7 +233,7 @@ const Chat = () => {
 
   /** ================== Properly wait for the recipient to be loaded ========================= */
   const recipient = room?.members.find(
-    (m: Member) => m._id !== user.user?.userId
+    (member: Member) => member._id !== user.user?.userId
   );
 
   /** =============== 8. Render =============== */
@@ -251,6 +242,7 @@ const Chat = () => {
       <div className="w-[30vw] bg-green-700 px-5 pt-2 pb-4">
         <div className="flex justify-between item-center bg-green-700 px-2 py-4 mb-4">
           <SidebarHeaderContent
+            photo={user.user?.photo}
             userName={user.user?.name}
             userInitials={user.user?.name?.slice(0, 2).toUpperCase()}
           />
@@ -287,6 +279,7 @@ const Chat = () => {
       <div className="w-[70vw] min-h-[30vh] h-dvh bg-gradient-to-b from-green-400 to-red-400">
         {room && showMessages && (
           <MessagesPanelHeader
+            photo={recipient?.photo}
             recipientName={recipient?.name}
             recipientInitials={recipient?.name?.slice(0, 2).toUpperCase()}
           />

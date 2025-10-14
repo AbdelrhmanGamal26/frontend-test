@@ -16,13 +16,22 @@ import AuthFormContainer from "@/components/shared/AuthFormContainer";
 import FormButtonsContainer from "@/components/shared/FormButtonsContainer";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
 
+interface FormType {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  photo: string | null;
+}
+
 const Signup = () => {
   const [image, setImage] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const user = useSelector((state: RootState) => state.user);
   const imagePreview = image && URL.createObjectURL(image);
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormType>({
     name: "",
     email: "",
     password: "",
@@ -39,17 +48,33 @@ const Signup = () => {
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("email", form.email);
+    formData.append("password", form.password);
+    formData.append("confirmPassword", form.confirmPassword);
+    if (image) formData.append("photo", image);
+
+    setIsLoading(true);
+
     try {
       const res = await axiosInstance.post(
         `${BACKEND_RESOURCES.AUTH}/signup`,
-        form
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       if (res.status === RESPONSE_STATUSES.CREATED) {
+        setIsLoading(false);
         navigate("/");
         toast(res.data?.message);
       }
     } catch (error) {
+      setIsLoading(false);
       if (error instanceof AxiosError) {
         toast(error.response?.data?.message);
       } else if (error instanceof Error) {
@@ -67,6 +92,7 @@ const Signup = () => {
         <AuthForm onSubmit={submitHandler}>
           <LabeledInputField
             id="name"
+            required={true}
             labelName="Name"
             inputFieldValue={form.name}
             placeholder="Enter your name"
@@ -74,6 +100,7 @@ const Signup = () => {
           />
           <LabeledInputField
             id="email"
+            required={true}
             labelName="Email"
             inputFieldValue={form.email}
             placeholder="Enter your email"
@@ -81,6 +108,7 @@ const Signup = () => {
           />
           <LabeledInputField
             id="password"
+            required={true}
             labelName="Password"
             fieldType="password"
             inputFieldValue={form.password}
@@ -88,6 +116,7 @@ const Signup = () => {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
           <LabeledInputField
+            required={true}
             id="confirmPassword"
             fieldType="password"
             labelName="Confirm Password"
@@ -99,12 +128,12 @@ const Signup = () => {
           />
           <UploadPhoto
             image={image}
-            imagePreview={imagePreview}
             onSetImage={setImage}
+            imagePreview={imagePreview}
           />
           <FormButtonsContainer>
             <CustomLink to="/login" title="Login" />
-            <CustomButton title="Sign up" type="submit" />
+            <CustomButton title="Sign up" isLoading={isLoading} type="submit" />
           </FormButtonsContainer>
         </AuthForm>
       </AuthFormContainer>

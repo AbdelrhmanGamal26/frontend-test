@@ -1,21 +1,24 @@
 import { Fragment } from "react";
+import UserDataHeader from "../shared/UserDataHeader";
 
 const SidebarHeaderContent = ({
+  photo,
   userName,
   userInitials,
 }: {
+  photo: string | undefined;
   userName: string | undefined;
   userInitials: string | undefined;
 }) => {
   return (
     <Fragment>
       <h3 className="text-3xl text-white mb-1">Chats</h3>
-      <div className="flex items-center gap-x-2">
-        <div className="w-[40px] h-[40px] text-white rounded-full bg-red-300 flex justify-center items-center">
-          {userInitials}
-        </div>
-        <p className="text-white text-xl">{userName}</p>
-      </div>
+      <UserDataHeader
+        photo={photo}
+        alt="User photo"
+        userName={userName}
+        userInitials={userInitials}
+      />
     </Fragment>
   );
 };

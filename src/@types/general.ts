@@ -1,13 +1,23 @@
 export interface Member {
-  email: string;
-  name: string;
   _id: string;
+  name: string;
+  email: string;
+  photo?: string;
 }
 
 export type ConversationType = {
   _id: string;
   roomId: string;
   members: Member[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type MessageType = {
+  _id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
   createdAt: Date;
   updatedAt: Date;
 };

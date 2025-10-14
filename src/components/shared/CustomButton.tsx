@@ -1,20 +1,29 @@
+import { Spinner } from "../ui/shadcn-io/spinner";
+
 type CustomButtonType = {
   title: string;
+  isLoading: boolean;
   buttonClasses?: string;
   type: "submit" | "reset" | "button" | undefined;
 };
 
 const CustomButton = ({
   title,
+  isLoading,
   type = "button",
   buttonClasses = "",
 }: CustomButtonType) => {
   return (
     <button
       type={type}
+      disabled={isLoading}
       className={`w-[5vw] px-1 py-1 flex justify-center items-center text-indigo-700 bg-yellow-200 hover:bg-green-500 transition-all duration-200 rounded-md cursor-pointer ${buttonClasses}`}
     >
-      {title}
+      {isLoading ? (
+        <Spinner className="text-indigo-700" size={24} variant="circle" />
+      ) : (
+        title
+      )}
     </button>
   );
 };
