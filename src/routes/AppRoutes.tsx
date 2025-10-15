@@ -1,17 +1,13 @@
 import { lazy } from "react";
 import { Route, Routes } from "react-router";
-import Home from "../pages/Home";
 import NotFound from "../pages/NotFound";
 import AppLayout from "../layouts/AppLayout";
-import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import VerifyEmail from "@/pages/authPages/VerifyEmail";
-import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute from "../components/custom/ProtectedRoute";
 
 const Chat = lazy(() => import("../pages/Chat"));
 const Profile = lazy(() => import("../pages/Profile"));
-const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Login = lazy(() => import("../pages/authPages/Login"));
 const Signup = lazy(() => import("../pages/authPages/Signup"));
 const ResetPassword = lazy(() => import("../pages/authPages/ResetPassword"));
@@ -39,17 +35,9 @@ const AppRoutes = () => {
         </Route>
 
         {/* this is a layout for certain routes */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-        </Route>
-
-        {/* this is a layout for certain routes */}
         <Route element={<ProtectedRoute />}>
-          <Route element={<DashboardLayout />}>
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat" element={<Chat />} />
-          </Route>
+          <Route path="/" element={<Chat />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
 
         {/* this route catches all unknown routes and renders a not found page */}

@@ -1,17 +1,26 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router";
 import axiosInstance from "../../lib/axios";
+import AuthForm from "@/components/shared/AuthForm";
+import FormHeader from "@/components/shared/FormHeader";
+import AuthAction from "@/components/shared/AuthAction";
+import CustomButton from "@/components/shared/CustomButton";
 import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
+import AuthFormContainer from "@/components/shared/AuthFormContainer";
+import LabeledInputField from "@/components/shared/LabeledInputField";
+import FormButtonsContainer from "@/components/shared/FormButtonsContainer";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
 
 const ResendVerificationEmail = () => {
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const res = await axiosInstance.post(
@@ -20,10 +29,12 @@ const ResendVerificationEmail = () => {
       );
 
       if (res.status === RESPONSE_STATUSES.SUCCESS) {
-        toast(res.data?.message);
         navigate("/login");
+        setIsLoading(false);
+        toast(res.data?.message);
       }
     } catch (error) {
+      setIsLoading(false);
       if (error instanceof AxiosError) {
         toast(error.response?.data?.message);
       } else if (error instanceof Error) {
@@ -36,43 +47,27 @@ const ResendVerificationEmail = () => {
 
   return (
     <SuspenseWrapper>
-      <div className="flex-col w-[28vw] min-h-[25vh] bg-gradient-to-b from-green-400 to-red-400 px-7 py-5 rounded-4xl">
-        <h2 className="text-2xl text-center mb-8 w-full text-indigo-700 font-bold">
-          Resend verification email
-        </h2>
-        <form onSubmit={submitHandler} className="flex-col h-full">
-          <div className="flex flex-col items-between w-full mb-5">
-            <label
-              htmlFor="email"
-              className="mb-1 ms-[2px] text-lg font-bold text-indigo-700"
-            >
-              Email
-            </label>
-            <input
-              type="text"
-              id="email"
-              value={email}
-              placeholder="Enter your email"
-              onChange={(e) => setEmail(e.target.value)}
-              className="border-2 border-yellow-200 rounded-md px-2 text-md h-[2.5vw] outline-none focus:border-green-500 focus:placeholder:text-transparent"
-            />
-          </div>
-          <div className="flex gap-x-1">
-            <p>Already verified your account?</p>
-            <Link to="/login" className="text-indigo-700 hover:text-orange-200">
-              Login
-            </Link>
-          </div>
-          <div className="w-full flex justify-end items-end gap-x-5 mt-10">
-            <button
-              className="w-[5vw] py-1 flex justify-center items-center text-indigo-700 bg-yellow-200 hover:bg-green-500 transition-all duration-200 rounded-md cursor-pointer"
-              type="submit"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
+      <AuthFormContainer>
+        <FormHeader title="Resend verification email" />
+        <AuthForm onSubmit={submitHandler}>
+          <LabeledInputField
+            id="email"
+            required={true}
+            labelName="Email"
+            inputFieldValue={email}
+            placeholder="Enter your email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <AuthAction
+            to="/login"
+            linkTitle="Login"
+            actionTitle="Already verified your account?"
+          />
+          <FormButtonsContainer containerClasses="!mt-4">
+            <CustomButton title="Submit" isLoading={isLoading} type="submit" />
+          </FormButtonsContainer>
+        </AuthForm>
+      </AuthFormContainer>
     </SuspenseWrapper>
   );
 };

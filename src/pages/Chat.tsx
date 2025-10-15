@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import {
   Member,
   APIError,
@@ -29,7 +29,9 @@ import FailedResourcesLoadingLoader from "@/components/shared/FailedResourcesLoa
 const Chat = () => {
   const user = useSelector((state: RootState) => state.user);
   const queryClient = useQueryClient();
-  const [room, setRoom] = useState<ConversationType | null>(null);
+  const [conversation, setConversation] = useState<ConversationType | null>(
+    null
+  );
   const [showMessages, setShowMessages] = useState(false);
   const [message, setMessage] = useState("");
   const [contact, setContact] = useState("");
@@ -43,7 +45,7 @@ const Chat = () => {
     if (event.key === "Escape") {
       socket.emit("leaveRoom", { roomId: roomIdRef.current });
 
-      setRoom(null);
+      setConversation(null);
       setShowMessages(false);
       conversationIdRef.current = "";
       roomIdRef.current = "";
@@ -77,7 +79,6 @@ const Chat = () => {
   } = useQuery({
     queryKey: ["messages", conversationIdRef.current],
     queryFn: () => fetchConversationMessages(conversationIdRef.current),
-    // enabled: !!conversationIdRef.current,
     enabled: !!conversationIdRef.current,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
@@ -85,7 +86,7 @@ const Chat = () => {
 
   /** =============== 3. Create or Join Conversation =============== */
   const handleJoinRoom = useCallback((conversation: ConversationType) => {
-    setRoom(conversation);
+    setConversation(conversation);
     setShowMessages(true);
 
     const conversationId = conversation._id;
@@ -150,7 +151,7 @@ const Chat = () => {
 
       // Emit via socket
       socket.emit("privateRoomChat", {
-        roomId: room?.roomId,
+        roomId: conversation?.roomId,
         msg: newMessage,
       });
 
@@ -177,7 +178,7 @@ const Chat = () => {
       roomId: string;
       msg: MessageType;
     }) => {
-      if (data.roomId !== room?.roomId) return;
+      if (data.roomId !== conversation?.roomId) return;
 
       // Skip message if the sender is the current user
       if (data.msg.senderId === user.user?.userId) return;
@@ -208,7 +209,7 @@ const Chat = () => {
     return () => {
       socket.off("privateRoomChat", handleIncomingMessage);
     };
-  }, [room?.roomId, user.user?.userId, queryClient]);
+  }, [conversation?.roomId, user.user?.userId, queryClient]);
 
   /** =============== 6. Handlers =============== */
   const messageSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
@@ -232,18 +233,19 @@ const Chat = () => {
   }, [messages]);
 
   /** ================== Properly wait for the recipient to be loaded ========================= */
-  const recipient = room?.members.find(
+  const recipient = conversation?.members.find(
     (member: Member) => member._id !== user.user?.userId
   );
 
   /** =============== 8. Render =============== */
   return (
     <div className="flex">
-      <div className="w-[30vw] bg-green-700 px-5 pt-2 pb-4">
+      <div className="w-[30vw] bg-green-700 px-5 pt-2 pb-5">
         <div className="flex justify-between item-center bg-green-700 px-2 py-4 mb-4">
           <SidebarHeaderContent
             photo={user.user?.photo}
             userName={user.user?.name}
+            roomId={conversation?.roomId}
             userInitials={user.user?.name?.slice(0, 2).toUpperCase()}
           />
         </div>
@@ -277,14 +279,14 @@ const Chat = () => {
         </div>
       </div>
       <div className="w-[70vw] min-h-[30vh] h-dvh bg-gradient-to-b from-green-400 to-red-400">
-        {room && showMessages && (
+        {conversation && showMessages && (
           <MessagesPanelHeader
             photo={recipient?.photo}
             recipientName={recipient?.name}
             recipientInitials={recipient?.name?.slice(0, 2).toUpperCase()}
           />
         )}
-        {showMessages && room ? (
+        {showMessages && conversation ? (
           isMessagesLoadingError ? (
             <ResourcesLoaderContainer>
               <FailedResourcesLoadingLoader
@@ -305,9 +307,9 @@ const Chat = () => {
                 messagesEndRef={messagesEndRef}
               />
               <MessageSendingForm
-                room={room}
                 message={message}
                 onSetMessage={setMessage}
+                conversation={conversation}
                 onSubmitMessageHandler={messageSubmitHandler}
               />
             </div>

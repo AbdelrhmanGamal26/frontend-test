@@ -1,7 +1,8 @@
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useSearchParams } from "react-router-dom";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 import axiosInstance from "../../lib/axios";
 import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../../constants/general";
 
@@ -35,11 +36,15 @@ const VerifyEmail = () => {
             navigate("/login");
         }
       } catch (error) {
-        console.log(error);
-        toast("Something went wrong while verifying your email.");
-        navigate("/login");
-      } finally {
         setIsLoading(false);
+        if (error instanceof AxiosError) {
+          navigate("/login");
+          toast(error.response?.data?.message);
+        } else if (error instanceof Error) {
+          toast(error?.message);
+        } else {
+          console.log(error);
+        }
       }
     };
 
@@ -51,7 +56,7 @@ const VerifyEmail = () => {
     }
   }, [verificationToken, navigate]);
 
-  return <div>{isLoading ? "Please wait..." : ""}</div>;
+  return <div className="text-white">{isLoading ? "Please wait..." : ""}</div>;
 };
 
 export default VerifyEmail;

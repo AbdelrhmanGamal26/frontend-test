@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
 import { RootState } from "../../store";
 import axiosInstance from "../../lib/axios";
 import AuthForm from "@/components/shared/AuthForm";
@@ -69,8 +69,8 @@ const Signup = () => {
       );
 
       if (res.status === RESPONSE_STATUSES.CREATED) {
-        setIsLoading(false);
         navigate("/");
+        setIsLoading(false);
         toast(res.data?.message);
       }
     } catch (error) {

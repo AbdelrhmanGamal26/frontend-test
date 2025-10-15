@@ -3,14 +3,14 @@ import { ConversationType } from "@/@types/general";
 
 type MessageSendingForm = {
   message: string;
-  room: ConversationType;
+  conversation: ConversationType;
   onSetMessage: (value: React.SetStateAction<string>) => void;
   onSubmitMessageHandler: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
 const MessageSendingForm = ({
-  room,
   message,
+  conversation,
   onSetMessage,
   onSubmitMessageHandler,
 }: MessageSendingForm) => {
@@ -25,14 +25,16 @@ const MessageSendingForm = ({
         onChange={(e) => onSetMessage(e.target.value)}
         placeholder="Write your message"
         className={`placeholder:text-white text-white w-full border-2 border-yellow-200 hover:border-yellow-400 transition-all duration-150 rounded-md px-2 text-md h-[40px] outline-none ${
-          room ? "focus:border-green-500" : "opacity-50 cursor-not-allowed"
+          conversation
+            ? "focus:border-green-500"
+            : "opacity-50 cursor-not-allowed"
         }`}
       />
       <button
         type="submit"
         disabled={!message.trim()}
         className={`w-[150px] h-[40px] rounded-md outline-none ${
-          room && message.trim()
+          conversation && message.trim()
             ? "bg-green-300 hover:bg-green-500 cursor-pointer"
             : "bg-gray-400 cursor-not-allowed"
         }`}

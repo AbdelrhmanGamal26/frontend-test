@@ -52,8 +52,8 @@ const Login = () => {
 
       // Always check the status after dispatching
       if (res.status === RESPONSE_STATUSES.SUCCESS) {
-        setIsLoading(false);
         navigate(from, { replace: true }); // user goes back to the protected route
+        setIsLoading(false);
         toast("login successful!");
       }
     } catch (error) {
