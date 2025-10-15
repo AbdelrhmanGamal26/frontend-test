@@ -24,13 +24,10 @@ const VerifyEmail = () => {
         switch (response.status) {
           case RESPONSE_STATUSES.BAD_REQUEST:
           case RESPONSE_STATUSES.SERVER:
-            setIsLoading(false);
-            navigate("/login");
-            break;
           case RESPONSE_STATUSES.SUCCESS:
           case RESPONSE_STATUSES.FOUND:
             setIsLoading(false);
-            navigate("/", { replace: true });
+            navigate("/login", { replace: true });
             break;
           default:
             navigate("/login");
@@ -41,8 +38,10 @@ const VerifyEmail = () => {
           navigate("/login");
           toast(error.response?.data?.message);
         } else if (error instanceof Error) {
+          navigate("/login");
           toast(error?.message);
         } else {
+          navigate("/login");
           console.log(error);
         }
       }

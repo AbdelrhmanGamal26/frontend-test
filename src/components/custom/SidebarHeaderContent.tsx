@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 import { EllipsisVertical } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import { logout } from "@/store/userSlice";
 import CustomLink from "../shared/CustomLink";
+import socket from "@/websocket/socketHandler";
 import CustomButton from "../shared/CustomButton";
 import UserDataHeader from "../shared/UserDataHeader";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "@/constants/general";
-import socket from "@/websocket/socketHandler";
 
 const SidebarHeaderContent = ({
   photo,
@@ -53,6 +54,7 @@ export default SidebarHeaderContent;
 const UserDropdownMenu = ({ roomId }: { roomId: string | undefined }) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const logoutHandler = async () => {
     setIsLoading(true);
@@ -62,6 +64,7 @@ const UserDropdownMenu = ({ roomId }: { roomId: string | undefined }) => {
         `${BACKEND_RESOURCES.USERS}/logout`
       );
       if (response.status === RESPONSE_STATUSES.SUCCESS) {
+        navigate("/login", { replace: true });
         dispatch(logout());
         setIsLoading(false);
         toast(response.data?.message);
@@ -85,7 +88,7 @@ const UserDropdownMenu = ({ roomId }: { roomId: string | undefined }) => {
             title="Logout"
             isLoading={isLoading}
             buttonClasses="w-full"
-            onClick={() => logoutHandler()}
+            onClick={logoutHandler}
           />
         </li>
       </ul>

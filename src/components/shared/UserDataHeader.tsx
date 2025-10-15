@@ -20,7 +20,7 @@ const UserDataHeader = ({
           {userInitials}
         </div>
       )}
-      <p className="text-white text-xl">{userName}</p>
+      <p className="text-white text-xl">{userName ?? "Deleted user"}</p>
     </div>
   );
 };

@@ -69,7 +69,7 @@ const Signup = () => {
       );
 
       if (res.status === RESPONSE_STATUSES.CREATED) {
-        navigate("/");
+        navigate("/login");
         setIsLoading(false);
         toast(res.data?.message);
       }
