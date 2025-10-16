@@ -9,6 +9,11 @@ export type ConversationType = {
   _id: string;
   roomId: string;
   members: Member[];
+  lastMessage: {
+    content: string;
+    sender: string;
+    createdAt: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 };

@@ -40,7 +40,7 @@ const Chat = () => {
   const conversationIdRef = useRef<string>("");
   const roomIdRef = useRef<string>("");
 
-  /** =============== Handle ESC to leave room =============== */
+  /** =============== Handle ESC to leave room =============== **/
   const handleEscPress = useCallback((event: KeyboardEvent) => {
     if (event.key === "Escape") {
       socket.emit("leaveRoom", { roomId: roomIdRef.current });
@@ -57,7 +57,20 @@ const Chat = () => {
     return () => document.removeEventListener("keydown", handleEscPress);
   }, [handleEscPress]);
 
-  /** =============== 1. Fetch user conversations =============== */
+  /** =============== Join user room on login =============== **/
+  useEffect(() => {
+    if (user.user?.userId) {
+      // Connect socket and join user's personal room
+      socket.connect();
+      socket.emit("joinUserRoom", { userId: user.user.userId });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [user.user?.userId]);
+
+  /** =============== 1. Fetch user conversations =============== **/
   const {
     data: conversations = [],
     isLoading: isConversationsLoading,
@@ -70,7 +83,7 @@ const Chat = () => {
     staleTime: 60 * 1000,
   });
 
-  /** =============== 2. Fetch messages for current room =============== */
+  /** =============== 2. Fetch messages for current room =============== **/
   const {
     data: messages = [],
     isLoading: isLoadingMessages,
@@ -84,7 +97,7 @@ const Chat = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  /** =============== 3. Create or Join Conversation =============== */
+  /** =============== 3. Create or Join Conversation =============== **/
   const handleJoinRoom = useCallback((conversation: ConversationType) => {
     setConversation(conversation);
     setShowMessages(true);
@@ -136,7 +149,7 @@ const Chat = () => {
     },
   });
 
-  /** =============== 4. Send Message =============== */
+  /** =============== 4. Send Message =============== **/
   const { mutate: submitMessage } = useMutation({
     mutationFn: () =>
       sendMessage(conversationIdRef.current, message, user.user!.userId),
@@ -153,6 +166,7 @@ const Chat = () => {
       socket.emit("privateRoomChat", {
         roomId: conversation?.roomId,
         msg: newMessage,
+        senderId: user.user!.userId,
       });
 
       queryClient.setQueryData(
@@ -162,8 +176,12 @@ const Chat = () => {
             conversation._id === newMessage.conversationId
               ? {
                   ...conversation,
-                  lastMessage: newMessage.content,
-                  updatedAt: new Date().toISOString(),
+                  lastMessage: {
+                    content: newMessage.content,
+                    sender: user.user!.userId,
+                    createdAt: new Date(),
+                  },
+                  updatedAt: new Date(),
                 }
               : conversation
           )
@@ -172,7 +190,7 @@ const Chat = () => {
     onError: () => toast("Failed to send message."),
   });
 
-  /** =============== 5. Socket Listener for Incoming Messages =============== */
+  /** =============== 5. Socket Listener for Incoming Messages =============== **/
   useEffect(() => {
     const handleIncomingMessage = (data: {
       roomId: string;
@@ -197,8 +215,12 @@ const Chat = () => {
             conversation._id === data.msg.conversationId
               ? {
                   ...conversation,
-                  lastMessage: data.msg.content,
-                  updatedAt: new Date().toISOString(),
+                  lastMessage: {
+                    content: data.msg.content,
+                    sender: user.user!.userId,
+                    createdAt: new Date(),
+                  },
+                  updatedAt: new Date(),
                 }
               : conversation
           )
@@ -209,9 +231,9 @@ const Chat = () => {
     return () => {
       socket.off("privateRoomChat", handleIncomingMessage);
     };
-  }, [conversation?.roomId, user.user?.userId, queryClient]);
+  }, [conversation?.roomId, user.user, queryClient]);
 
-  /** =============== 6. Handlers =============== */
+  /** =============== 6. Handlers =============== **/
   const messageSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -225,19 +247,75 @@ const Chat = () => {
     setOpen(false);
   };
 
-  /** =============== 7. Auto-scroll to bottom =============== */
+  /** =============== 7. Auto-scroll to bottom =============== **/
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /** ================== Properly wait for the recipient to be loaded ========================= */
+  /** ================== Properly wait for the recipient to be loaded ========================= **/
   const recipient = conversation?.members.find(
     (member: Member) => member._id !== user.user?.userId
   );
 
-  /** =============== 8. Render =============== */
+  /** ================== Listen for new conversations (FIRST MESSAGE ONLY) ========================= **/
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewConversationWithMessage = (data: {
+      conversation: ConversationType;
+      message: MessageType;
+    }) => {
+      console.log("New conversation received (first message):", data);
+
+      const { conversation, message } = data;
+
+      // Add conversation to list with first message
+      queryClient.setQueryData<ConversationType[]>(
+        ["conversations"],
+        (old = []) => {
+          const exists = old.some((c) => c._id === conversation._id);
+
+          if (!exists) {
+            // Add new conversation with first message
+            return [
+              {
+                ...conversation,
+                lastMessage: {
+                  content: message.content,
+                  sender: user.user!.userId,
+                  createdAt: new Date(),
+                },
+                updatedAt: new Date(),
+              },
+              ...old,
+            ];
+          }
+
+          return old;
+        }
+      );
+
+      // Show notification
+      const sender = conversation.members.find(
+        (m: Member) => m._id !== user.user?.userId
+      );
+      toast.info(`New message from ${sender?.name || "Someone"}!`);
+    };
+
+    // This event is emitted ONLY for the first message
+    socket.on("newConversationWithMessage", handleNewConversationWithMessage);
+
+    return () => {
+      socket.off(
+        "newConversationWithMessage",
+        handleNewConversationWithMessage
+      );
+    };
+  }, [queryClient, user.user]);
+
+  /** =============== 8. Render =============== **/
   return (
     <div className="flex">
       <div className="w-[30vw] bg-green-700 px-5 pt-2 pb-5">
