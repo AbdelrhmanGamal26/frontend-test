@@ -1,4 +1,5 @@
-import { MessageType } from "@/pages/Chat";
+import { MessageType } from "@/@types/general";
+import { formatFullMessageDateTime } from "@/lib/utils";
 
 const MessagesContainer = ({
   userId,
@@ -21,7 +22,10 @@ const MessagesContainer = ({
                 : "self-start bg-blue-200"
             }`}
           >
-            {msg.content}
+            <p>{msg.content}</p>
+            <p className="text-[12px]">
+              {formatFullMessageDateTime(new Date(msg.createdAt))}
+            </p>
           </li>
         ))}
         <div ref={messagesEndRef} />

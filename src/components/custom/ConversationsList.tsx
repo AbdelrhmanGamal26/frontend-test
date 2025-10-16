@@ -29,6 +29,7 @@ const ConversationsList = ({
               key={conversation._id}
               photo={recipientUser?.photo}
               recipientUser={recipientUser}
+              lastMessage={conversation.lastMessage ?? {}}
               onClick={() => onConversationClick(conversation)}
               userInitials={recipientUser?.name.slice(0, 2).toUpperCase()}
             />
