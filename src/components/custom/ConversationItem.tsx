@@ -31,11 +31,13 @@ const ConversationItem = ({
           {userInitials}
         </div>
       )}
-      <div className="w-full flex flex-col">
+      <div className="flex flex-col flex-1">
         <p>{recipientUser?.name ?? "Deleted user"}</p>
         <div className="w-full flex justify-between items-center">
-          <p>{lastMessage.content}</p>
-          {messageTime && <p className="text-[13px]">Sent at: {messageTime}</p>}
+          <p className="max-w-[150px] truncate">{lastMessage.content}</p>
+          {messageTime && (
+            <p className="text-[12px] mt-[4px]">Sent: {messageTime}</p>
+          )}
         </div>
       </div>
     </li>
