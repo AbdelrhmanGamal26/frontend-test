@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!user.isLoggedIn && !location.state?.justLoggedOut) {
+    if (!user.isLoggedIn) {
       toast("You are not logged in. Please login first.");
     }
   }, [user.isLoggedIn, location.state]);

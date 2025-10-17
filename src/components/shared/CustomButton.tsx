@@ -1,3 +1,4 @@
+import { Button } from "../ui/button";
 import { Spinner } from "../ui/shadcn-io/spinner";
 
 type CustomButtonType = {
@@ -16,18 +17,18 @@ const CustomButton = ({
   buttonClasses = "",
 }: CustomButtonType) => {
   return (
-    <button
+    <Button
       type={type}
       onClick={onClick}
       disabled={isLoading}
-      className={`w-[5vw] px-1 py-1 flex justify-center items-center text-indigo-700 bg-yellow-200 hover:bg-green-500 transition-all duration-200 rounded-md cursor-pointer ${buttonClasses}`}
+      className={buttonClasses}
     >
       {isLoading ? (
-        <Spinner className="text-indigo-700" size={24} variant="circle" />
+        <Spinner className="text-white" size={24} variant="circle" />
       ) : (
         title
       )}
-    </button>
+    </Button>
   );
 };
 

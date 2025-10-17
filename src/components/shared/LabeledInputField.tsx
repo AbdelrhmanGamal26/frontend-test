@@ -1,43 +1,59 @@
+import React, { useState } from "react";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import TogglePasswordVisibility from "./TogglePasswordVisibility";
+
 type LabeledInputFieldType = {
   id: string;
   required: boolean;
   labelName: string;
-  fieldType?: string;
   placeholder: string;
+  icon: React.ReactNode;
   labelClasses?: string;
   inputClasses?: string;
   inputFieldValue: string;
+  fieldType?: "text" | "password";
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const LabeledInputField = ({
   id,
+  icon,
   required,
   onChange,
   labelName,
   placeholder,
   inputFieldValue,
-  labelClasses = "",
-  inputClasses = "",
   fieldType = "text",
 }: LabeledInputFieldType) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const inputType =
+    fieldType === "password" ? (showPassword ? "text" : "password") : "text";
+
   return (
-    <div className="flex flex-col items-between w-full mb-3">
-      <label
-        htmlFor={id}
-        className={`mb-1 ms-[2px] text-lg font-bold text-indigo-700 ${labelClasses}`}
-      >
+    <div className="flex flex-col items-between w-full mb-4">
+      <Label htmlFor={id} className="mb-2">
         {labelName}
         <span className="text-red-500">{required && "*"}</span>
-      </label>
-      <input
-        id={id}
-        type={fieldType}
-        onChange={onChange}
-        value={inputFieldValue}
-        placeholder={placeholder}
-        className={`border-2 border-yellow-200 rounded-md px-2 text-md h-[2.5vw] outline-none focus:border-green-500 focus:placeholder:text-transparent ${inputClasses}`}
-      />
+      </Label>
+      <div className="relative">
+        {icon}
+        <Input
+          id={id}
+          type={inputType}
+          onChange={onChange}
+          value={inputFieldValue}
+          placeholder={placeholder}
+          className="pl-10 bg-white"
+        />
+        {fieldType === "password" && (
+          <TogglePasswordVisibility
+            showPassword={showPassword}
+            onSetShowPassword={setShowPassword}
+          />
+        )}
+      </div>
     </div>
   );
 };

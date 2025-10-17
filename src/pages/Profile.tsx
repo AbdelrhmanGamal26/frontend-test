@@ -17,14 +17,17 @@ const Profile = () => {
 
   const clickHandler = async () => {
     try {
-      const response =
-        (await axiosInstance.delete(`${BACKEND_RESOURCES.USERS}/me`)) || {};
+      const response = await axiosInstance.delete(
+        `${BACKEND_RESOURCES.USERS}/me`
+      );
 
-      if (response.status === RESPONSE_STATUSES.NO_CONTENT) {
+      const data = response.data || {};
+
+      if (response.status === RESPONSE_STATUSES.SUCCESS) {
         delete axiosInstance.defaults.headers.common["Authorization"];
         dispatch(logout());
-        navigate("/profile", { state: { justLoggedOut: true } });
-        toast(response?.data.message);
+        navigate("/login", { replace: true });
+        toast(data?.message);
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -41,16 +44,16 @@ const Profile = () => {
   return (
     <SuspenseWrapper>
       <div>
-        <h1 className=" text-3xl">profile page</h1>
+        <h1 className="text-3xl">Profile</h1>
         <CustomDialog
           open={open}
           setOpen={setOpen}
           triggerClasses="!bg-transparent"
           contentClassName="!max-w-[90vw] sm:!max-w-[50vw] lg:!max-w-[35vw] top-[50%] translate-y-[-50%]"
           trigger={
-            <button className="bg-red-400 hover:bg-red-700 rounded-md outline-0 px-2 py-1 text-white cursor-pointer transition-all duration-150">
+            <div className="bg-red-400 hover:bg-red-700 rounded-md outline-0 px-2 py-1 text-white cursor-pointer transition-all duration-150">
               Delete profile
-            </button>
+            </div>
           }
         >
           <DeleteItemOverlayContent

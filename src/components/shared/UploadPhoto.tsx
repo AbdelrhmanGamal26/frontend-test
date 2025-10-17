@@ -1,5 +1,8 @@
 import React, { useRef } from "react";
 import { Upload } from "lucide-react";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 
 type UploadPhotoType = {
   image: File | null;
@@ -12,10 +15,8 @@ const UploadPhoto = ({ image, onSetImage, imagePreview }: UploadPhotoType) => {
 
   return (
     <div className="flex flex-col">
-      <span className="mb-1 ms-[2px] text-lg font-bold text-indigo-700">
-        Photo
-      </span>
-      <input
+      <Label className="mb-2">Photo</Label>
+      <Input
         id="photo"
         type="file"
         ref={imageRef}
@@ -29,15 +30,17 @@ const UploadPhoto = ({ image, onSetImage, imagePreview }: UploadPhotoType) => {
           htmlFor="photo"
           className={`${
             imagePreview ? "w-[85%]" : "w-full"
-          } flex items-center justify-between border-2 border-yellow-200 rounded-md px-2 text-md h-[2.5vw] outline-none focus:border-green-500 cursor-pointer`}
+          } relative flex items-center justify-between bg-white rounded-md py-1 pe-3 ${
+            imagePreview ? "pl-3" : "pl-10"
+          } text-md h-[36px] outline-none focus:border-green-500 cursor-pointer`}
         >
           {imagePreview ? (
             <div className="w-full flex justify-between items-center">
-              <span className="text-[14px] text-white w-[75%] truncate">
+              <span className="text-[14px] text-gray-700 w-[75%] truncate">
                 {image?.name}
               </span>
-              <button
-                className="text-[14px] text-white cursor-pointer p-1 rounded-md hover:bg-[#ff0000] transition-all duration-200"
+              <Button
+                className="text-[13px] font-normal h-[24px] text-white cursor-pointer p-1 rounded-md bg-red-400 hover:bg-[#ff0000] transition-all duration-200"
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -48,12 +51,12 @@ const UploadPhoto = ({ image, onSetImage, imagePreview }: UploadPhotoType) => {
                 }}
               >
                 Remove
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="w-full flex items-center justify-between">
+            <div className="w-full flex items-center">
+              <Upload className="authIconClasses" />
               <span className="text-[#3f3f3f]">No file chosen</span>
-              <Upload className="w-4 h-4 text-white" />
             </div>
           )}
         </label>
@@ -61,7 +64,7 @@ const UploadPhoto = ({ image, onSetImage, imagePreview }: UploadPhotoType) => {
           <img
             alt="avatar"
             src={imagePreview ? imagePreview : ""}
-            className="w-[48px] h-[48px] object-fill rounded-full"
+            className="w-[45px] h-[45px] object-fill rounded-full"
           />
         )}
       </div>

@@ -1,17 +1,17 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { AxiosError } from "axios";
+import { Lock } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../lib/axios";
 import AuthForm from "@/components/shared/AuthForm";
-import FormHeader from "@/components/shared/FormHeader";
 import AuthAction from "@/components/shared/AuthAction";
 import CustomButton from "@/components/shared/CustomButton";
 import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
 import LabeledInputField from "@/components/shared/LabeledInputField";
 import AuthFormContainer from "@/components/shared/AuthFormContainer";
-import FormButtonsContainer from "@/components/shared/FormButtonsContainer";
 import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../../constants/general";
+import ResetPasswordFormHeader from "@/components/custom/ResetPasswordFormHeader";
 
 type UserInput = {
   password: string;
@@ -87,8 +87,7 @@ const ResetPassword = () => {
 
   return (
     <SuspenseWrapper>
-      <AuthFormContainer>
-        <FormHeader title="Reset password" />
+      <AuthFormContainer authFormHeader={<ResetPasswordFormHeader />}>
         <AuthForm onSubmit={submitHandler}>
           <Fragment>
             <LabeledInputField
@@ -96,33 +95,38 @@ const ResetPassword = () => {
               required={true}
               labelName="Password"
               fieldType="password"
+              placeholder="••••••••"
               inputFieldValue={form.password}
-              placeholder="Enter your password"
+              icon={<Lock className="authIconClasses" />}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
             <LabeledInputField
               required={true}
-              id="confirmPassword"
               fieldType="password"
+              id="confirmPassword"
+              placeholder="••••••••"
               labelName="Confirm Password"
               inputFieldValue={form.confirmPassword}
-              placeholder="Re-enter your password"
+              icon={<Lock className="authIconClasses" />}
               onChange={(e) =>
                 setForm({ ...form, confirmPassword: e.target.value })
               }
             />
           </Fragment>
-          <Fragment>
-            <AuthAction
-              to="/login"
-              linkTitle="Login"
-              actionTitle="Remembered your password?"
-            />
-          </Fragment>
-          <FormButtonsContainer containerClasses="!mt-4">
-            <CustomButton title="Submit" isLoading={isLoading} type="submit" />
-          </FormButtonsContainer>
+          <CustomButton
+            type="submit"
+            title="Submit"
+            isLoading={isLoading}
+            buttonClasses="w-full mt-2 bg-gradient-to-r from-emerald-500 to-yellow-400 hover:from-emerald-600 hover:to-yellow-500 transition-colors text-white shadow-lg cursor-pointer"
+          />
         </AuthForm>
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
+          <AuthAction
+            to="/login"
+            linkTitle="Login"
+            actionTitle="Remembered your password?"
+          />
+        </div>
       </AuthFormContainer>
     </SuspenseWrapper>
   );

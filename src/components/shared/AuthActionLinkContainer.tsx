@@ -8,7 +8,7 @@ const AuthActionLinkContainer = ({
   containerClasses?: string;
 }) => {
   return (
-    <div className={`flex items-center gap-x-1 ${containerClasses}`}>
+    <div className={`flex items-center gap-x-1 mb-2 ${containerClasses}`}>
       {children}
     </div>
   );

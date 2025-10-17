@@ -1,21 +1,21 @@
+import { Fragment, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import { Fragment, useEffect, useState } from "react";
+import { Lock, Mail } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router";
 import { RootState } from "../../store";
 import { login } from "../../store/userSlice";
 import AuthForm from "@/components/shared/AuthForm";
-import FormHeader from "@/components/shared/FormHeader";
-import CustomLink from "@/components/shared/CustomLink";
 import AuthAction from "@/components/shared/AuthAction";
 import CustomButton from "@/components/shared/CustomButton";
 import axiosInstance, { setAccessToken } from "../../lib/axios";
 import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
+import LoginFormHeader from "@/components/custom/LoginFormHeader";
 import LabeledInputField from "@/components/shared/LabeledInputField";
 import AuthFormContainer from "@/components/shared/AuthFormContainer";
-import FormButtonsContainer from "@/components/shared/FormButtonsContainer";
 import { RESPONSE_STATUSES, BACKEND_RESOURCES } from "../../constants/general";
+import GlassmorphismBackground from "@/components/shared/GlassmorphismBackground";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -70,8 +70,9 @@ const Login = () => {
 
   return (
     <SuspenseWrapper>
-      <AuthFormContainer>
-        <FormHeader title="Login" />
+      {/* Glassmorphism background elements */}
+      <GlassmorphismBackground />
+      <AuthFormContainer authFormHeader={<LoginFormHeader />}>
         <AuthForm onSubmit={submitHandler}>
           <Fragment>
             <LabeledInputField
@@ -79,23 +80,25 @@ const Login = () => {
               required={true}
               labelName="Email"
               inputFieldValue={form.email}
-              placeholder="Enter your email"
+              placeholder="you@example.com"
+              icon={<Mail className="authIconClasses" />}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <LabeledInputField
               id="password"
               required={true}
-              labelName="Password"
               fieldType="password"
+              labelName="Password"
+              placeholder="••••••••"
               inputFieldValue={form.password}
-              placeholder="Enter your password"
+              icon={<Lock className="authIconClasses" />}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
           </Fragment>
-          <Fragment>
+          <div className="mt-6 mb-5">
             <AuthAction
               to="/forgot-password"
-              linkTitle="Click here"
+              linkTitle="Reset password"
               actionTitle="Forgot Password?"
             />
             <AuthAction
@@ -103,11 +106,19 @@ const Login = () => {
               linkTitle="Resend verification email"
               actionTitle="Didn't verify your account?"
             />
-          </Fragment>
-          <FormButtonsContainer containerClasses="!mt-4">
-            <CustomLink to="/signup" title="Signup" />
-            <CustomButton title="Login" isLoading={isLoading} type="submit" />
-          </FormButtonsContainer>
+          </div>
+          <CustomButton
+            title="Login"
+            type="submit"
+            isLoading={isLoading}
+            buttonClasses="w-full bg-gradient-to-r from-emerald-500 to-yellow-400 hover:from-emerald-600 hover:to-yellow-500 transition-colors text-white shadow-lg cursor-pointer"
+          />
+          <AuthAction
+            to="/signup"
+            linkTitle="Sign up"
+            actionTitle="Don't have an account?"
+            containerClasses="w-full justify-center mt-5 !mb-0"
+          />
         </AuthForm>
       </AuthFormContainer>
     </SuspenseWrapper>

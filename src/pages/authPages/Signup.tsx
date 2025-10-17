@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { Lock, Mail, User } from "lucide-react";
 import { RootState } from "../../store";
 import axiosInstance from "../../lib/axios";
 import AuthForm from "@/components/shared/AuthForm";
-import CustomLink from "@/components/shared/CustomLink";
-import FormHeader from "@/components/shared/FormHeader";
+import AuthAction from "@/components/shared/AuthAction";
 import UploadPhoto from "@/components/shared/UploadPhoto";
+import AppFeatures from "@/components/custom/AppFeatures";
 import CustomButton from "@/components/shared/CustomButton";
 import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
+import SignupFormHeader from "@/components/custom/SignupFormHeader";
 import LabeledInputField from "@/components/shared/LabeledInputField";
 import AuthFormContainer from "@/components/shared/AuthFormContainer";
-import FormButtonsContainer from "@/components/shared/FormButtonsContainer";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
+import GlassmorphismBackground from "@/components/shared/GlassmorphismBackground";
 
 interface FormType {
   name: string;
@@ -87,15 +89,17 @@ const Signup = () => {
 
   return (
     <SuspenseWrapper>
-      <AuthFormContainer>
-        <FormHeader title="Signup" />
+      <GlassmorphismBackground />
+      <AppFeatures />
+      <AuthFormContainer authFormHeader={<SignupFormHeader />}>
         <AuthForm onSubmit={submitHandler}>
           <LabeledInputField
             id="name"
             required={true}
             labelName="Name"
+            placeholder="John Doe"
             inputFieldValue={form.name}
-            placeholder="Enter your name"
+            icon={<User className="authIconClasses" />}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <LabeledInputField
@@ -103,25 +107,28 @@ const Signup = () => {
             required={true}
             labelName="Email"
             inputFieldValue={form.email}
-            placeholder="Enter your email"
+            placeholder="you@example.com"
+            icon={<Mail className="authIconClasses" />}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <LabeledInputField
             id="password"
             required={true}
-            labelName="Password"
             fieldType="password"
+            labelName="Password"
+            placeholder="••••••••"
             inputFieldValue={form.password}
-            placeholder="Enter your password"
+            icon={<Lock className="authIconClasses" />}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
           <LabeledInputField
             required={true}
-            id="confirmPassword"
             fieldType="password"
+            id="confirmPassword"
+            placeholder="••••••••"
             labelName="Confirm Password"
-            placeholder="Re-enter your password"
             inputFieldValue={form.confirmPassword}
+            icon={<Lock className="authIconClasses" />}
             onChange={(e) =>
               setForm({ ...form, confirmPassword: e.target.value })
             }
@@ -131,10 +138,18 @@ const Signup = () => {
             onSetImage={setImage}
             imagePreview={imagePreview}
           />
-          <FormButtonsContainer>
-            <CustomLink to="/login" title="Login" />
-            <CustomButton title="Sign up" isLoading={isLoading} type="submit" />
-          </FormButtonsContainer>
+          <CustomButton
+            type="submit"
+            title="Sign up"
+            isLoading={isLoading}
+            buttonClasses="w-full mt-8 bg-gradient-to-r from-emerald-500 to-yellow-400 hover:from-emerald-600 hover:to-yellow-500 transition-colors text-white shadow-lg cursor-pointer"
+          />
+          <AuthAction
+            to="/login"
+            linkTitle="Login"
+            actionTitle="Already have an account?"
+            containerClasses="w-full justify-center mt-5 !mb-0"
+          />
         </AuthForm>
       </AuthFormContainer>
     </SuspenseWrapper>

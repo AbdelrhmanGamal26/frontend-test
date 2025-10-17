@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
+import { Mail } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../lib/axios";
 import AuthForm from "@/components/shared/AuthForm";
-import FormHeader from "@/components/shared/FormHeader";
 import AuthAction from "@/components/shared/AuthAction";
 import CustomButton from "@/components/shared/CustomButton";
 import SuspenseWrapper from "@/components/shared/SuspenseWrapper";
 import AuthFormContainer from "@/components/shared/AuthFormContainer";
 import LabeledInputField from "@/components/shared/LabeledInputField";
-import FormButtonsContainer from "@/components/shared/FormButtonsContainer";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
+import GlassmorphismBackground from "@/components/shared/GlassmorphismBackground";
+import ForgotPasswordFormHeader from "@/components/custom/ForgotPasswordFormHeader";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -47,26 +48,33 @@ const ForgotPassword = () => {
 
   return (
     <SuspenseWrapper>
-      <AuthFormContainer>
-        <FormHeader title="Forgot password" />
+      <GlassmorphismBackground />
+      <AuthFormContainer authFormHeader={<ForgotPasswordFormHeader />}>
         <AuthForm onSubmit={submitHandler}>
           <LabeledInputField
             id="email"
             required={true}
             labelName="Email"
             inputFieldValue={email}
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             onChange={(e) => setEmail(e.target.value)}
+            icon={<Mail className="authIconClasses" />}
           />
+          <CustomButton
+            type="submit"
+            title="Submit"
+            isLoading={isLoading}
+            buttonClasses="w-full mt-2 bg-gradient-to-r from-emerald-500 to-yellow-400 hover:from-emerald-600 hover:to-yellow-500 transition-colors text-white shadow-lg cursor-pointer"
+          />
+        </AuthForm>
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
           <AuthAction
             to="/login"
             linkTitle="Login"
+            containerClasses="!mb-0"
             actionTitle="Remembered your password?"
           />
-          <FormButtonsContainer containerClasses="!mt-4">
-            <CustomButton title="Submit" isLoading={isLoading} type="submit" />
-          </FormButtonsContainer>
-        </AuthForm>
+        </div>
       </AuthFormContainer>
     </SuspenseWrapper>
   );
