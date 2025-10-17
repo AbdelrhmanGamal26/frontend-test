@@ -26,6 +26,7 @@ const AppRoutes = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route
             path="/resend-verification-email"
@@ -35,7 +36,6 @@ const AppRoutes = () => {
 
         {/* this is a layout for certain routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
