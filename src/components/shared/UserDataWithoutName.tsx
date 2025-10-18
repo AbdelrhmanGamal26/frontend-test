@@ -1,18 +1,20 @@
+import { Link } from "react-router";
 import UserPhoto from "./UserPhoto";
 
-const UserDataHeader = ({
+const UserDataWithoutName = ({
   alt,
   photo,
-  userName,
   userInitials,
 }: {
   alt: string;
   photo: string | undefined;
-  userName: string | undefined;
   userInitials: string | undefined;
 }) => {
   return (
-    <div className="flex items-center gap-x-2">
+    <Link
+      to="/profile"
+      className="flex items-center gap-x-2 cursor-pointer group rounded-full hover:ring-4 hover:ring-green-500 transition-all duration-300 ease-out"
+    >
       {photo ? (
         <UserPhoto src={photo} alt={alt} />
       ) : (
@@ -20,9 +22,8 @@ const UserDataHeader = ({
           {userInitials}
         </div>
       )}
-      <p className="text-white text-xl">{userName ?? "Deleted user"}</p>
-    </div>
+    </Link>
   );
 };
 
-export default UserDataHeader;
+export default UserDataWithoutName;

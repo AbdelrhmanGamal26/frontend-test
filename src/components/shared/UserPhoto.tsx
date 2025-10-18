@@ -8,12 +8,10 @@ const UserPhoto = ({
   imgContainerClasses?: string;
 }) => {
   return (
-    <div className="w-[45px] h-[45px] rounded-full overflow-hidden">
-      <img
-        src={src}
-        alt={alt}
-        className={`w-full h-full object-fill ${imgContainerClasses}`}
-      />
+    <div
+      className={`w-[40px] h-[40px] rounded-full overflow-hidden ${imgContainerClasses}`}
+    >
+      <img src={src} alt={alt} className="w-full h-full object-fill" />
     </div>
   );
 };

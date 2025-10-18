@@ -1,41 +1,28 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import {
-  Member,
-  APIError,
-  MessageType,
-  ConversationType,
-} from "@/@types/general";
-import {
-  sendMessage,
-  getUserConversations,
-  createOrJoinConversation,
-  fetchConversationMessages,
-} from "@/services/conversationServices";
 import { RootState } from "@/store";
 import socket from "@/websocket/socketHandler";
-import Loader from "@/components/shared/Loader";
-import ConversationsList from "@/components/custom/ConversationsList";
-import MessagesContainer from "@/components/custom/MessagesContainer";
-import MessageSendingForm from "@/components/custom/MessageSendingForm";
-import MessagesPanelHeader from "@/components/custom/MessagesPanelHeader";
-import SidebarHeaderContent from "@/components/custom/SidebarHeaderContent";
-import StartChatDialogButton from "@/components/custom/StartChatDialogButton";
-import ResourcesLoaderContainer from "@/components/shared/ResourcesLoaderContainer";
-import FailedResourcesLoadingLoader from "@/components/shared/FailedResourcesLoadingLoader";
+import { createOrJoinConversation } from "@/services/conversationServices";
+import GlassmorphismBackground from "@/components/shared/GlassmorphismBackground";
+import {
+  Member,
+  MessageType,
+  ConversationType,
+  APIError,
+} from "@/@types/general";
+import ChatMessagesPanelSection from "@/components/custom/ChatMessagesPanelSection";
+import ChatConversationsListSection from "@/components/custom/ChatConversationsListSection";
 
 const Chat = () => {
-  const user = useSelector((state: RootState) => state.user);
-  const queryClient = useQueryClient();
   const [conversation, setConversation] = useState<ConversationType | null>(
     null
   );
   const [showMessages, setShowMessages] = useState(false);
-  const [message, setMessage] = useState("");
-  const [contact, setContact] = useState("");
-  const [open, setOpen] = useState(false);
+  const [selectedConversationId, setSelectedConversationId] = useState("");
+  const user = useSelector((state: RootState) => state.user);
+  const queryClient = useQueryClient();
 
   const conversationIdRef = useRef<string>("");
   const roomIdRef = useRef<string>("");
@@ -44,9 +31,10 @@ const Chat = () => {
   const handleEscPress = useCallback((event: KeyboardEvent) => {
     if (event.key === "Escape") {
       socket.emit("leaveRoom", { roomId: roomIdRef.current });
-
+      setSelectedConversationId("");
       setConversation(null);
       setShowMessages(false);
+
       conversationIdRef.current = "";
       roomIdRef.current = "";
     }
@@ -57,49 +45,10 @@ const Chat = () => {
     return () => document.removeEventListener("keydown", handleEscPress);
   }, [handleEscPress]);
 
-  /** =============== Join user room on login =============== **/
-  useEffect(() => {
-    if (user.user?.userId) {
-      // Connect socket and join user's personal room
-      socket.connect();
-      socket.emit("joinUserRoom", { userId: user.user.userId });
-
-      return () => {
-        socket.disconnect();
-      };
-    }
-  }, [user.user?.userId]);
-
-  /** =============== 1. Fetch user conversations =============== **/
-  const {
-    data: conversations = [],
-    isLoading: isConversationsLoading,
-    isError: isConversationsLoadingError,
-    refetch: refetchConversations,
-  } = useQuery({
-    queryKey: ["conversations"],
-    queryFn: getUserConversations,
-    refetchOnWindowFocus: false,
-    staleTime: 60 * 1000,
-  });
-
-  /** =============== 2. Fetch messages for current room =============== **/
-  const {
-    data: messages = [],
-    isLoading: isLoadingMessages,
-    isError: isMessagesLoadingError,
-    refetch: refetchMessages,
-  } = useQuery({
-    queryKey: ["messages", conversationIdRef.current],
-    queryFn: () => fetchConversationMessages(conversationIdRef.current),
-    enabled: !!conversationIdRef.current,
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  /** =============== 3. Create or Join Conversation =============== **/
-  const handleJoinRoom = useCallback((conversation: ConversationType) => {
+  /** =============== Create or Join Conversation =============== **/
+  const handleJoinRoom = (conversation: ConversationType) => {
     setConversation(conversation);
+    setSelectedConversationId(conversation._id);
     setShowMessages(true);
 
     const conversationId = conversation._id;
@@ -111,19 +60,11 @@ const Chat = () => {
     // Connect socket and join room
     socket.connect();
     socket.emit("joinRoom", { roomId: newRoomId });
-  }, []);
-
-  const handleConversationClick = useCallback(
-    (conversation: ConversationType) => {
-      // Set room directly without making API call (conversation already exists)
-      handleJoinRoom(conversation);
-    },
-    [handleJoinRoom]
-  );
+  };
 
   const { mutate: joinOrCreateRoom } = useMutation({
     mutationFn: createOrJoinConversation,
-    onSuccess: (conversation) => {
+    onSuccess: (conversation: ConversationType) => {
       handleJoinRoom(conversation);
 
       // Refresh conversations list preview
@@ -149,48 +90,20 @@ const Chat = () => {
     },
   });
 
-  /** =============== 4. Send Message =============== **/
-  const { mutate: submitMessage } = useMutation({
-    mutationFn: () =>
-      sendMessage(conversationIdRef.current, message, user.user!.userId),
-    onSuccess: (newMessage) => {
-      setMessage("");
+  /** =============== Join user room on login =============== **/
+  useEffect(() => {
+    if (user.user?.userId) {
+      // Connect socket and join user's personal room
+      socket.connect();
+      socket.emit("joinUserRoom", { userId: user.user.userId });
 
-      // Update messages cache
-      queryClient.setQueryData<MessageType[]>(
-        ["messages", conversationIdRef.current],
-        (old = []) => [...old, newMessage]
-      );
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [user.user?.userId]);
 
-      // Emit via socket
-      socket.emit("privateRoomChat", {
-        roomId: conversation?.roomId,
-        msg: newMessage,
-        senderId: user.user!.userId,
-      });
-
-      queryClient.setQueryData(
-        ["conversations"],
-        (old: ConversationType[] = []) =>
-          old.map((conversation: ConversationType) =>
-            conversation._id === newMessage.conversationId
-              ? {
-                  ...conversation,
-                  lastMessage: {
-                    content: newMessage.content,
-                    sender: user.user!.userId,
-                    createdAt: new Date(),
-                  },
-                  updatedAt: new Date(),
-                }
-              : conversation
-          )
-      );
-    },
-    onError: () => toast("Failed to send message."),
-  });
-
-  /** =============== 5. Socket Listener for Incoming Messages =============== **/
+  /** =============== Socket Listener for Incoming Messages =============== **/
   useEffect(() => {
     const handleIncomingMessage = (data: {
       roomId: string;
@@ -233,28 +146,7 @@ const Chat = () => {
     };
   }, [conversation?.roomId, user.user, queryClient]);
 
-  /** =============== 6. Handlers =============== **/
-  const messageSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    submitMessage();
-  };
-
-  const startChatHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setContact("");
-    joinOrCreateRoom(contact);
-    setOpen(false);
-  };
-
-  /** =============== 7. Auto-scroll to bottom =============== **/
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  /** ================== Properly wait for the recipient to be loaded ========================= **/
+  /** ================== Wait for the recipient to be loaded ========================= **/
   const recipient = conversation?.members.find(
     (member: Member) => member._id !== user.user?.userId
   );
@@ -315,89 +207,27 @@ const Chat = () => {
     };
   }, [queryClient, user.user]);
 
-  /** =============== 8. Render =============== **/
   return (
-    <div className="flex">
-      <div className="w-[30vw] bg-green-700 px-5 pt-2 pb-5">
-        <div className="flex justify-between item-center bg-green-700 px-2 py-4 mb-4">
-          <SidebarHeaderContent
-            photo={user.user?.photo}
-            userName={user.user?.name}
-            roomId={conversation?.roomId}
-            userInitials={user.user?.name?.slice(0, 2).toUpperCase()}
-          />
-        </div>
-        <div className="flex flex-col h-[92%] justify-between">
-          {isConversationsLoadingError ? (
-            <ResourcesLoaderContainer>
-              <FailedResourcesLoadingLoader
-                actionTitle="load conversations"
-                onClick={() => refetchConversations()}
-                errorMessage="Error loading conversations"
-              />
-            </ResourcesLoaderContainer>
-          ) : isConversationsLoading ? (
-            <ResourcesLoaderContainer>
-              <Loader loaderText="Loading conversations..." />
-            </ResourcesLoaderContainer>
-          ) : (
-            <ConversationsList
-              user={user}
-              conversations={conversations}
-              onConversationClick={handleConversationClick}
-            />
-          )}
-          <StartChatDialogButton
-            open={open}
-            contact={contact}
-            onSetOpen={setOpen}
-            onSetContact={setContact}
-            onStartChatHandler={startChatHandler}
-          />
-        </div>
-      </div>
-      <div className="w-[70vw] min-h-[30vh] h-dvh bg-gradient-to-b from-green-400 to-red-400">
-        {conversation && showMessages && (
-          <MessagesPanelHeader
-            photo={recipient?.photo}
-            recipientName={recipient?.name}
-            recipientInitials={recipient?.name?.slice(0, 2).toUpperCase()}
-          />
-        )}
-        {showMessages && conversation ? (
-          isMessagesLoadingError ? (
-            <ResourcesLoaderContainer>
-              <FailedResourcesLoadingLoader
-                actionTitle="load messages"
-                onClick={() => refetchMessages()}
-                errorMessage="Error loading messages"
-              />
-            </ResourcesLoaderContainer>
-          ) : isLoadingMessages ? (
-            <ResourcesLoaderContainer>
-              <Loader loaderText="Loading messages..." />
-            </ResourcesLoaderContainer>
-          ) : (
-            <div className="px-7">
-              <MessagesContainer
-                messages={messages}
-                userId={user.user?.userId}
-                messagesEndRef={messagesEndRef}
-              />
-              <MessageSendingForm
-                message={message}
-                onSetMessage={setMessage}
-                conversation={conversation}
-                onSubmitMessageHandler={messageSubmitHandler}
-              />
-            </div>
-          )
-        ) : (
-          <div className="flex justify-center items-center h-[92%]">
-            <p className="text-2xl text-white">Start a conversation</p>
-          </div>
-        )}
-      </div>
+    <div
+      className="flex bg-gradient-to-br from-emerald-400 via-green-500 to-yellow-400
+               dark:from-emerald-900 dark:via-green-950 dark:to-yellow-900 relative overflow-hidden"
+    >
+      <GlassmorphismBackground />
+      <ChatConversationsListSection
+        user={user}
+        conversation={conversation}
+        handleJoinRoom={handleJoinRoom}
+        joinOrCreateRoom={joinOrCreateRoom}
+        selectedConversationId={selectedConversationId}
+        onSetSelectedConversationId={setSelectedConversationId}
+      />
+      <ChatMessagesPanelSection
+        recipient={recipient}
+        userId={user.user!.userId}
+        showMessages={showMessages}
+        conversation={conversation}
+        conversationId={conversationIdRef.current}
+      />
     </div>
   );
 };

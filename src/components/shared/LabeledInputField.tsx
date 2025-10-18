@@ -35,7 +35,7 @@ const LabeledInputField = ({
     <div className="flex flex-col items-between w-full mb-4">
       <Label htmlFor={id} className="mb-2">
         {labelName}
-        <span className="text-red-500">{required && "*"}</span>
+        <span className="text-red-500 -ml-1.5">{required && "*"}</span>
       </Label>
       <div className="relative">
         {icon}

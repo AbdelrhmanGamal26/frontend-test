@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
@@ -17,6 +17,7 @@ import LabeledInputField from "@/components/shared/LabeledInputField";
 import AuthFormContainer from "@/components/shared/AuthFormContainer";
 import { BACKEND_RESOURCES, RESPONSE_STATUSES } from "../../constants/general";
 import GlassmorphismBackground from "@/components/shared/GlassmorphismBackground";
+import PasswordStrengthIndicator from "@/components/custom/PasswordStrengthIndicator";
 
 interface FormType {
   name: string;
@@ -111,16 +112,23 @@ const Signup = () => {
             icon={<Mail className="authIconClasses" />}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
-          <LabeledInputField
-            id="password"
-            required={true}
-            fieldType="password"
-            labelName="Password"
-            placeholder="••••••••"
-            inputFieldValue={form.password}
-            icon={<Lock className="authIconClasses" />}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
+          <Fragment>
+            <LabeledInputField
+              id="password"
+              required={true}
+              fieldType="password"
+              labelName="Password"
+              placeholder="••••••••"
+              inputFieldValue={form.password}
+              icon={<Lock className="authIconClasses" />}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+            {form.password && (
+              <PasswordStrengthIndicator
+                passwordLength={form.password.length}
+              />
+            )}
+          </Fragment>
           <LabeledInputField
             required={true}
             fieldType="password"

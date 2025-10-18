@@ -16,24 +16,14 @@ const MessagesContainer = ({
         {messages.map((msg) => (
           <li
             key={msg._id}
-            className={`w-fit min-w-[250px] max-w-[450px] text-wrap break-words px-2 py-1 rounded-md ${
+            className={`w-fit min-w-[175px] max-w-[450px] text-wrap break-words px-2 py-1 rounded-2xl backdrop-blur-sm ${
               msg.senderId === userId
-                ? "self-end bg-green-200"
-                : "self-start bg-blue-200"
+                ? "bg-gradient-to-r from-emerald-500 to-yellow-400 text-white rounded-br-md shadow-md self-end"
+                : "bg-white/60 dark:bg-black/50 text-gray-900 dark:text-emerald-50 rounded-bl-md border border-white/30 dark:border-emerald-500/30 shadow-md self-start"
             }`}
           >
-            <p
-              className={`${
-                msg.senderId === userId ? "text-end" : "text-start"
-              }`}
-            >
-              {msg.content}
-            </p>
-            <p
-              className={`text-[12px] ${
-                msg.senderId === userId ? "text-start" : "text-end"
-              }`}
-            >
+            <p className="text-start">{msg.content}</p>
+            <p className="text-[12px] text-end">
               {formatFullMessageDateTime(new Date(msg.createdAt))}
             </p>
           </li>

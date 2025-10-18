@@ -2,8 +2,8 @@ const StartChatIcon = (props: { [key: string]: string }) => {
   return (
     <svg
       fill="#fff"
-      height="32px"
-      width="32px"
+      height="24px"
+      width="24px"
       version="1.1"
       id="Layer_1"
       xmlns="http://www.w3.org/2000/svg"

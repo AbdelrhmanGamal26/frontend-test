@@ -20,7 +20,7 @@ const CustomDialog = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        className={`${triggerClasses} py-[6px] flex items-center outline-none`}
+        className={`${triggerClasses} py-1.5 flex items-center outline-none`}
       >
         {trigger}
       </DialogTrigger>
